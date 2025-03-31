@@ -12,6 +12,15 @@ The template creates a custom Azure Policy definition that automatically install
 - CrowdStrike Falcon API credentials (Client ID and Client Secret)
 - CrowdStrike Customer ID (CID)
 
+Ensure the following API scopes are enabled:
+
+- Install:
+  - **Sensor Download** [read]
+  - **Sensor update policies** [read]
+- Uninstall:
+  - **Host** [write]
+  - **Sensor update policies** [write]
+
 ## Parameters
 
 | Parameter | Description | Default |
