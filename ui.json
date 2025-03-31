@@ -1,0 +1,139 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+    "handler": "Microsoft.Azure.CreateUIDef",
+    "version": "0.1.2-preview",
+    "parameters": {
+      "basics": [
+        {
+          "name": "policyInfo",
+          "type": "Microsoft.Common.InfoBox",
+          "visible": true,
+          "options": {
+            "icon": "Info",
+            "text": "This template will deploy an Azure Policy that automatically installs CrowdStrike Falcon on Linux VMs."
+          }
+        }
+      ],
+      "steps": [
+        {
+          "name": "policy",
+          "label": "Policy Settings",
+          "elements": [
+            {
+              "name": "policyPrefix",
+              "type": "Microsoft.Common.TextBox",
+              "label": "Policy Name Prefix",
+              "defaultValue": "CS-Deploy-Falcon-Linux",
+              "toolTip": "Prefix for the policy assignment and definition names",
+              "constraints": {
+                "required": true,
+                "regex": "^[a-zA-Z0-9-]{3,40}$",
+                "validationMessage": "Policy prefix must be between 3 and 40 characters, and can only include letters, numbers, and hyphens."
+              }
+            },
+            {
+              "name": "policyEffect",
+              "type": "Microsoft.Common.DropDown",
+              "label": "Policy Effect",
+              "defaultValue": "DeployIfNotExists",
+              "toolTip": "Select the policy effect",
+              "constraints": {
+                "allowedValues": [
+                  {
+                    "label": "Deploy If Not Exists",
+                    "value": "DeployIfNotExists"
+                  },
+                  {
+                    "label": "Audit If Not Exists",
+                    "value": "AuditIfNotExists"
+                  },
+                  {
+                    "label": "Disabled",
+                    "value": "Disabled"
+                  }
+                ],
+                "required": true
+              },
+              "visible": true
+            },
+            {
+              "name": "scopeSelector",
+              "type": "Microsoft.Common.OptionsGroup",
+              "label": "Policy Scope",
+              "defaultValue": "Management Group",
+              "toolTip": "Select the scope to which the policy will be applied",
+              "constraints": {
+                "allowedValues": [
+                  {
+                    "label": "Management Group",
+                    "value": "ManagementGroup"
+                  },
+                  {
+                    "label": "Subscription",
+                    "value": "Subscription"
+                  }
+                ],
+                "required": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "crowdStrikeSettings",
+          "label": "CrowdStrike Settings",
+          "elements": [
+            {
+              "name": "falconCid",
+              "type": "Microsoft.Common.TextBox",
+              "label": "CrowdStrike Customer ID (CID)",
+              "defaultValue": "",
+              "toolTip": "Your CrowdStrike Customer ID (CID)",
+              "constraints": {
+                "required": true,
+                "regex": "^[A-Za-z0-9-]+$",
+                "validationMessage": "Please enter a valid CrowdStrike CID."
+              }
+            },
+            {
+              "name": "falconClientId",
+              "type": "Microsoft.Common.PasswordBox",
+              "label": {
+                "password": "API Client ID",
+                "confirmPassword": "Confirm API Client ID"
+              },
+              "toolTip": "CrowdStrike API Client ID",
+              "constraints": {
+                "required": true,
+                "regex": "^.+$",
+                "validationMessage": "API Client ID is required."
+              }
+            },
+            {
+              "name": "falconClientSecret",
+              "type": "Microsoft.Common.PasswordBox",
+              "label": {
+                "password": "API Client Secret",
+                "confirmPassword": "Confirm API Client Secret"
+              },
+              "toolTip": "CrowdStrike API Client Secret",
+              "constraints": {
+                "required": true,
+                "regex": "^.+$",
+                "validationMessage": "API Client Secret is required."
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": {
+        "policyAssignmentName": "[concat(steps('policy').policyPrefix, '-Assignment')]",
+        "policyDefinitionName": "[concat(steps('policy').policyPrefix, '-Definition')]",
+        "policyEffect": "[steps('policy').policyEffect]",
+        "location": "[location()]",
+        "FalconCid": "[steps('crowdStrikeSettings').falconCid]",
+        "FalconClientId": "[steps('crowdStrikeSettings').falconClientId]",
+        "FalconClientSecret": "[steps('crowdStrikeSettings').falconClientSecret]",
+        "targetScope": "[steps('policy').scopeSelector]"
+      }
+    }
+  }
