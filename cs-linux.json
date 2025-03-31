@@ -1,0 +1,275 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.34.44.8038",
+      "templateHash": "15122009593267459154"
+    }
+  },
+  "parameters": {
+    "policyAssignmentName": {
+      "type": "string",
+      "defaultValue": "CS-Deploy-Falcon-Linux",
+      "metadata": {
+        "description": "Policy assignment name"
+      }
+    },
+    "policyDefinitionName": {
+      "type": "string",
+      "defaultValue": "CS-Falcon-Linux",
+      "metadata": {
+        "description": "Policy definition name"
+      }
+    },
+    "FalconCid": {
+      "type": "string",
+      "metadata": {
+        "description": "CrowdStrike Member CID"
+      }
+    },
+    "policyEffect": {
+      "type": "string",
+      "defaultValue": "DeployIfNotExists",
+      "allowedValues": [
+        "DeployIfNotExists",
+        "AuditIfNotExists",
+        "Disabled"
+      ],
+      "metadata": {
+        "description": "Effect for the policy assignment (DeployIfNotExists, AuditIfNotExists, Disabled)"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for policy assignment"
+      }
+    },
+    "FalconClientId": {
+      "type": "securestring"
+    },
+    "FalconClientSecret": {
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "vmRoleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Authorization/policyDefinitions",
+      "apiVersion": "2020-09-01",
+      "name": "[parameters('policyDefinitionName')]",
+      "properties": {
+        "displayName": "Deploy CrowdStrike Falcon agent on Linux VMs",
+        "description": "This policy deploys CrowdStrike Falcon agent on Linux VMs if not installed",
+        "policyType": "Custom",
+        "mode": "Indexed",
+        "metadata": {
+          "category": "Security",
+          "version": "1.0.0"
+        },
+        "parameters": {
+          "effect": {
+            "type": "String",
+            "metadata": {
+              "displayName": "Effect",
+              "description": "Enable or disable the execution of the policy"
+            },
+            "allowedValues": [
+              "DeployIfNotExists",
+              "AuditIfNotExists",
+              "Disabled"
+            ],
+            "defaultValue": "DeployIfNotExists"
+          },
+          "FalconClientId": {
+            "type": "String",
+            "metadata": {
+              "displayName": "CrowdStrike Client ID",
+              "description": "CrowdStrike API Client ID"
+            }
+          },
+          "FalconClientSecret": {
+            "type": "String",
+            "metadata": {
+              "displayName": "CrowdStrike Client Secret",
+              "description": "CrowdStrike API Client Secret"
+            }
+          },
+          "FalconCid": {
+            "type": "String",
+            "metadata": {
+              "displayName": "CrowdStrike Member CID",
+              "description": "CrowdStrike Customer ID (CID)"
+            }
+          }
+        },
+        "policyRule": {
+          "if": {
+            "allOf": [
+              {
+                "field": "type",
+                "equals": "Microsoft.Compute/virtualMachines"
+              },
+              {
+                "field": "Microsoft.Compute/virtualMachines/osProfile.linuxConfiguration",
+                "exists": "true"
+              }
+            ]
+          },
+          "then": {
+            "effect": "[[parameters('effect')]",
+            "details": {
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "roleDefinitionIds": [
+                "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('vmRoleDefinitionId'))]"
+              ],
+              "existenceCondition": {
+                "allOf": [
+                  {
+                    "field": "Microsoft.Compute/virtualMachines/extensions/type",
+                    "equals": "CustomScript"
+                  },
+                  {
+                    "field": "Microsoft.Compute/virtualMachines/extensions/publisher",
+                    "equals": "Microsoft.Azure.Extensions"
+                  },
+                  {
+                    "field": "name",
+                    "like": "CrowdStrikeFalconInstall*"
+                  }
+                ]
+              },
+              "deployment": {
+                "properties": {
+                  "mode": "incremental",
+                  "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                      "vmName": {
+                        "type": "string"
+                      },
+                      "location": {
+                        "type": "string"
+                      },
+                      "FalconClientId": {
+                        "type": "string"
+                      },
+                      "FalconClientSecret": {
+                        "type": "securestring"
+                      },
+                      "FalconCid": {
+                        "type": "string"
+                      }
+                    },
+                    "resources": [
+                      {
+                        "name": "[[concat(parameters('vmName'), '/CrowdStrikeFalconInstall')]",
+                        "type": "Microsoft.Compute/virtualMachines/extensions",
+                        "location": "[[parameters('location')]",
+                        "apiVersion": "2021-11-01",
+                        "properties": {
+                          "publisher": "Microsoft.Azure.Extensions",
+                          "type": "CustomScript",
+                          "typeHandlerVersion": "2.1",
+                          "autoUpgradeMinorVersion": true,
+                          "settings": {
+                            "fileUris": [
+                              "https://raw.githubusercontent.com/CrowdStrike/falcon-scripts/main/bash/install/falcon-linux-install.sh"
+                            ]
+                          },
+                          "protectedSettings": {
+                            "commandToExecute": "[[concat('wget -q https://raw.githubusercontent.com/CrowdStrike/falcon-scripts/main/bash/install/falcon-linux-install.sh && chmod +x falcon-linux-install.sh && FALCON_CLIENT_ID=', parameters('FalconClientId'), ' FALCON_CLIENT_SECRET=', parameters('FalconClientSecret'), ' ./falcon-linux-install.sh --cid ', parameters('FalconCid'))]"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "parameters": {
+                    "vmName": {
+                      "value": "[[field('name')]"
+                    },
+                    "location": {
+                      "value": "[[field('location')]"
+                    },
+                    "FalconClientId": {
+                      "value": "[[parameters('FalconClientId')]"
+                    },
+                    "FalconClientSecret": {
+                      "value": "[[parameters('FalconClientSecret')]"
+                    },
+                    "FalconCid": {
+                      "value": "[[parameters('FalconCid')]"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2020-09-01",
+      "name": "[parameters('policyAssignmentName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "policyDefinitionId": "[extensionResourceId(managementGroup().id, 'Microsoft.Authorization/policyDefinitions', parameters('policyDefinitionName'))]",
+        "displayName": "Deploy CrowdStrike Falcon agent on Linux VMs",
+        "description": "This policy ensures CrowdStrike Falcon agent is installed on all Linux VMs",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('policyEffect')]"
+          },
+          "FalconClientId": {
+            "value": "[parameters('FalconClientId')]"
+          },
+          "FalconClientSecret": {
+            "value": "[parameters('FalconClientSecret')]"
+          },
+          "FalconCid": {
+            "value": "[parameters('FalconCid')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(managementGroup().id, 'Microsoft.Authorization/policyDefinitions', parameters('policyDefinitionName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(extensionResourceId(managementGroup().id, 'Microsoft.Authorization/policyAssignments', parameters('policyAssignmentName')), variables('vmRoleDefinitionId'), managementGroup().id, 'CrowdStrikeFalcon')]",
+      "properties": {
+        "principalId": "[reference(extensionResourceId(managementGroup().id, 'Microsoft.Authorization/policyAssignments', parameters('policyAssignmentName')), '2020-09-01', 'full').identity.principalId]",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('vmRoleDefinitionId'))]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[extensionResourceId(managementGroup().id, 'Microsoft.Authorization/policyAssignments', parameters('policyAssignmentName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "policyDefinitionId": {
+      "type": "string",
+      "value": "[extensionResourceId(managementGroup().id, 'Microsoft.Authorization/policyDefinitions', parameters('policyDefinitionName'))]"
+    },
+    "policyAssignmentId": {
+      "type": "string",
+      "value": "[extensionResourceId(managementGroup().id, 'Microsoft.Authorization/policyAssignments', parameters('policyAssignmentName'))]"
+    },
+    "policyPrincipalId": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(managementGroup().id, 'Microsoft.Authorization/policyAssignments', parameters('policyAssignmentName')), '2020-09-01', 'full').identity.principalId]"
+    }
+  }
+}
