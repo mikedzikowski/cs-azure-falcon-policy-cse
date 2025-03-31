@@ -12,6 +12,16 @@
             "icon": "Info",
             "text": "This template will deploy an Azure Policy that automatically installs CrowdStrike Falcon on Linux VMs."
           }
+        },
+        {
+          "name": "apiPermissionsInfo",
+          "type": "Microsoft.Common.InfoBox",
+          "visible": true,
+          "options": {
+            "icon": "Warning",
+            "text": "IMPORTANT: The CrowdStrike API credentials you provide must have the following permissions enabled:<br><br><b>For Installation:</b><ul><li><b>Sensor Download</b> [read]</li><li><b>Sensor update policies</b> [read]</li></ul><b>For Uninstallation:</b><ul><li><b>Host</b> [write]</li><li><b>Sensor update policies</b> [write]</li></ul>",
+            "uri": "https://falcon.crowdstrike.com/support/documentation"
+          }
         }
       ],
       "steps": [
