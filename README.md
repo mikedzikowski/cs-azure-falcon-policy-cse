@@ -1,6 +1,6 @@
 # CrowdStrike Falcon Deployment via Azure Policy (Windows and Linux)
 
-This Bicep template deploys CrowdStrike Falcon agent to Windows and Linux virtual machines across your Azure environment using Azure Policy and a Custom Script Extension.
+This Bicep template deploys CrowdStrike Falcon agent to Windows and Linux virtual machines across your Azure environment using Azure Policy and a Custom Script Extension. This solution is a community solution not directly supported by Crowdstrike.
 
 ## Overview
 
