@@ -36,13 +36,21 @@ Ensure the following API scopes are enabled:
 
 ## Deployment
 
-### Windows Policy
+### Windows Policy  - Management Group Scope
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fcs-azure-falcon-policy-cse%2Fmain%2Fcs-windows.json/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fcs-azure-falcon-policy-cse%2Fmain%2Fui.json)
 
-### Linux Policy
+### Linux Policy - Management Group Scope
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fcs-azure-falcon-policy-cse%2Fmain%2Fcs-linux.json/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fcs-azure-falcon-policy-cse%2Fmain%2Fui.json)
+
+### Windows Policy  - Subscription Scope
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fcs-azure-falcon-policy-cse%2Fmain%2Fcs-windows-subscription.json/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fcs-azure-falcon-policy-cse%2Fmain%2Fui-subscription.json)
+
+### Linux Policy - Subscription Scope
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fcs-azure-falcon-policy-cse%2Fmain%2Fcs-linux-subscription.json/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fcs-azure-falcon-policy-cse%2Fmain%2Fui-subscription.json)
 
 ### Azure CLI
 

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "basics": [],
+    "steps": [
+      {
+        "name": "falconConfig",
+        "label": "Falcon Configuration",
+        "elements": [
+          {
+            "name": "falconClientId",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Falcon Client ID",
+            "toolTip": "The Falcon OAuth2 Client ID",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-zA-Z0-9]{32}$",
+              "validationMessage": "Client ID must be 32 alphanumeric characters."
+            }
+          },
+          {
+            "name": "falconClientSecret",
+            "type": "Microsoft.Common.PasswordBox",
+            "label": {
+              "password": "Falcon Client Secret",
+              "confirmPassword": "Confirm Falcon Client Secret"
+            },
+            "toolTip": "The Falcon OAuth2 Client Secret",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "falconCloud",
+            "type": "Microsoft.Common.DropDown",
+            "label": "Falcon Cloud",
+            "defaultValue": "us-1",
+            "toolTip": "The Falcon Cloud region",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "US-1",
+                  "value": "us-1"
+                },
+                {
+                  "label": "US-2",
+                  "value": "us-2"
+                },
+                {
+                  "label": "EU-1",
+                  "value": "eu-1"
+                },
+                {
+                  "label": "GOV-1",
+                  "value": "usgov-1"
+                }
+              ],
+              "required": true
+            }
+          },
+          {
+            "name": "policyMode",
+            "type": "Microsoft.Common.DropDown",
+            "label": "Policy Mode",
+            "defaultValue": "Audit",
+            "toolTip": "Select whether to audit or enforce the policy",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "Audit",
+                  "value": "Audit"
+                },
+                {
+                  "label": "Enforce",
+                  "value": "Default"
+                }
+              ],
+              "required": true
+            }
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "falconClientId": "[steps('falconConfig').falconClientId]",
+      "falconClientSecret": "[steps('falconConfig').falconClientSecret]",
+      "falconCloud": "[steps('falconConfig').falconCloud]",
+      "policyMode": "[steps('falconConfig').policyMode]",
+      "location": "[location()]"
+    }
+  }
+}
